@@ -1,6 +1,7 @@
 --Cadastro
 
-select 
+select count(*)
+/*
            trim(coalesce (to_char(cpes.id_conta,'99999999'),''))                                                   ||'#'||
            coalesce  (prin.desc_prod_instituicao,''       )                                                        ||'#'||
            trim(coalesce (to_char(prin.id                  ,'99999999'),''))                                       ||'#'||
@@ -66,25 +67,33 @@ select
 	       WHEN 1 THEN trim(coalesce (to_char(sacc.saldo_fatura_atual*100 ,'9999999999'),''))                                                                                    
 	       WHEN 0 THEN  ''                                  
            END                                                                                                     ||'#'||
-           trim(coalesce (to_char(tapr.parcela_futura ,'9999999999'),'')) 											   ||'#'||                  
+           trim(coalesce (to_char((tapr.parcela_qtd-tapr.parcela_nro_parcela) 
+                                                            * tapr.valor_moeda_liquidacao *100 ,'9999999999'),'')) ||'#'||                  
            CASE cred.titularidade 
 	       WHEN 1 THEN    trim(coalesce (to_char(cpag.qtd_dias_atraso ,'9999'),''))                                                                                 
 	       WHEN 0 THEN  ''                                 
            END      
-                                                                                                                   ||'#'          
-from        cadastral.conta_pagamento cpag
-inner join  cadastral.credencial cred on cred.id_conta = cpag.id_conta 
-inner join suporte.tipo_status tpst on tpst.id_status = cpag.id_status_conta  
-inner join cadastral.produto_instituicao prin on prin.id_prod_instituicao = cpag.id_prod_instituicao
-inner join transacional.saldo_conta_cred sacc on sacc.id_conta = cpag.id_conta 
-inner join transacional.temp_saldo_conta_cred sacc_temp on sacc_temp.id_conta = sacc.id_conta and sacc.ano_mes_fat=sacc_temp.ano_mes_fat
-inner join cadastral.conta_pessoa cpes on cpes.id_conta = cpag.id_conta 
-inner join cadastral.pessoa pess on pess.id_pessoa = cpes.id_conta
-inner join cadastral.temp_end_bahamas ende on ende.id_pessoa = pess.id_pessoa
-left JOIN suporte.registro_arq_importacao_proposta_pf rapf ON rapf.documento = pess.documento
-inner join transacional.temp_transacao_apresentada tapr on tapr.id_conta = cpag.id_conta
-inner join cadastral.conta_pagamento_fat cpaf on cpaf.id_conta = cpag.id_conta 
-where       cpag.id_instituicao = 1201
-and         cpag.id_status_conta not in (63, 64)
-and         cred.titularidade in (0, 1)                                                                                                         
+                                                                                                                   ||'#'          */
+
+-- FROM cadastral.pessoa              pess
+           left JOIN suporte.registro_arq_importacao_proposta_pf rapf ON rapf.documento = pess.documento
+           --inner join cadastral.temp_end_bahamas ende on ende.id_pessoa = pess.id_pessoa
+	   	   --inner join cadastral.conta_pessoa cpes on cpes.id_pessoa = pess.id_pessoa
+	   	   --inner join cadastral.conta_pagamento cpag on cpag.id_conta = cpes.id_conta  
+	   	   --inner join cadastral.conta_pagamento_fat cpaf on cpaf.id_conta = cpag.id_conta  OBS: não utilizado
+	   	   --inner join cadastral.credencial cred on cred.id_conta = cpag.id_conta 
+	   	   --inner join suporte.tipo_status tpst on tpst.id_status = cpag.id_status_conta  
+	   	   --inner join cadastral.produto_instituicao prin on prin.id_prod_instituicao = cpag.id_prod_instituicao
+	   	   --inner join transacional.transacao_apresentada tapr on tapr.id_conta = cpag.id_conta OBS: substituir pela tabela temp_transacao_apresentada 
+	   	   --inner join transacional.saldo_conta_cred sacc on sacc.id_conta = cpag.id_conta 
+	   	   --inner join transacional.temp_saldo_conta_cred sacc_temp on sacc_temp.id_conta = sacc.id_conta and sacc.ano_mes_fat=sacc_temp.ano_mes_fat
+
+	   	   
+WHERE 	cpag.id_instituicao = 1201
+		and cpag.id_status_conta not in(63,64)-- OBS PERFORMANCE (cpag.id_status_conta != 63 or cpag.id_status_conta != 64) 
+		and cred.titularidade in (0,1)  -- OBS REQ:selecionar apenas contas com titularidade 0 ou 1
+		--and sacc.ano_mes_fat in (select max (sac2.ano_mes_fat) from transacional.saldo_conta_cred sac2 where sac2.id_conta = sacc.id_conta) -- OBS removido para utilização de tabela temporária
+		--and cred.csn in (1) OBS: Há necessidade? COND1
+		--and cred.csn in (select max(cre2.csn) from cadastral.credencial cre2 where cre2.id_conta = cred.id_conta and cre2.titularidade in (0,1)) -- OBS: ajuste de script OBS: não é um filtro aplicado no requisito
+		--and cred.csn in (select max(cre2.csn) from cadastral.credencial cre2 where cre2.id_conta = cred.id_conta) -- Removido COND1
 		

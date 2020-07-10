@@ -16,7 +16,7 @@ select distinct on (ep.id_pessoa) id_pessoa,ep.id_endereco, ep.id_tipo_endereco,
 (select ep23.cep from cadastral.endereco_pessoa ep23 where ep23.id_tipo_endereco = 2         and ep23.id_pessoa=ep.id_pessoa and ep23.status = 1) as cep_c
 from cadastral.endereco_pessoa ep
 where
-ep.id_pessoa = 828432 and
+ep.id_pessoa = 828432 AND --pq da retrição?
 ep.id_endereco not in(        
  select e1.id_endereco
  from cadastral.endereco_pessoa e1,
