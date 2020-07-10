@@ -1,6 +1,6 @@
 --Cadastro
 
-select count(cpag.*)
+select count(*)
 /*
            trim(coalesce (to_char(cpes.id_conta,'99999999'),''))                                                   ||'#'||
            coalesce  (prin.desc_prod_instituicao,''       )                                                        ||'#'||
@@ -72,7 +72,8 @@ select count(cpag.*)
            CASE cred.titularidade 
 	       WHEN 1 THEN    trim(coalesce (to_char(cpag.qtd_dias_atraso ,'9999'),''))                                                                                 
 	       WHEN 0 THEN  ''                                 
-           END                                                                                                     ||'#'          */                 
+           END      
+                                                                                                         ||'#'          */                 
 FROM cadastral.pessoa              pess
            left JOIN suporte.registro_arq_importacao_proposta_pf rapf ON rapf.documento = pess.documento
            inner join cadastral.temp_end_bahamas ende on ende.id_pessoa = pess.id_pessoa
@@ -84,11 +85,14 @@ FROM cadastral.pessoa              pess
 	   	   inner join cadastral.produto_instituicao prin on prin.id_prod_instituicao = cpag.id_prod_instituicao
 	   	   inner join transacional.transacao_apresentada tapr on tapr.id_conta = cpag.id_conta  
 	   	   inner join transacional.saldo_conta_cred sacc on sacc.id_conta = cpag.id_conta 
+	   	   inner join transacional.temp_saldo_conta_cred sacc_temp on sacc_temp.id_conta = sacc.id_conta and sacc.ano_mes_fat=sacc_temp.ano_mes_fat
+
+	   	   
 WHERE 	cpag.id_instituicao = 1201
 		and cpag.id_status_conta not in(63,64)-- OBS PERFORMANCE (cpag.id_status_conta != 63 or cpag.id_status_conta != 64) 
 		and cred.titularidade in (0,1)  -- OBS REQ:selecionar apenas contas com titularidade 0 ou 1
-		and sacc.ano_mes_fat in (select max (sac2.ano_mes_fat) from transacional.saldo_conta_cred sac2 where sac2.id_conta = sacc.id_conta) -- OBS tabela temporaria com condição max
+		--and sacc.ano_mes_fat in (select max (sac2.ano_mes_fat) from transacional.saldo_conta_cred sac2 where sac2.id_conta = sacc.id_conta) -- OBS removido para utilização de tabela temporária
 		--and cred.csn in (1) OBS: Há necessidade? COND1
-		and cred.csn in (select max(cre2.csn) from cadastral.credencial cre2 where cre2.id_conta = cred.id_conta and cre2.titularidade in (0,1)) -- OBS: ajuste de script
+		--and cred.csn in (select max(cre2.csn) from cadastral.credencial cre2 where cre2.id_conta = cred.id_conta and cre2.titularidade in (0,1)) -- OBS: ajuste de script OBS: não é um filtro aplicado no requisito
 		--and cred.csn in (select max(cre2.csn) from cadastral.credencial cre2 where cre2.id_conta = cred.id_conta) -- Removido COND1
 		
