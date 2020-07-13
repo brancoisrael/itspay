@@ -1,0 +1,6 @@
+DROP TABLE cadastral.temp_end_bahamas;
+DROP TABLE transacional.temp_liquidacao_transacao_apresentada;
+DROP TABLE transacional.temp_liquidacao_saldo_conta_cred;
+DROP TABLE cadastral.temp_produto_instituicao_config_credito;
+DROP TABLE cadastral.temp_conta_pagamento_fat;
+DROP TABLE cadastral.temp_escritorio_cobranca_conta;
