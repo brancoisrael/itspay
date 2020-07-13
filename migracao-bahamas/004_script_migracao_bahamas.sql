@@ -29,7 +29,7 @@ select
 	       CASE WHEN (cpag.qtd_dias_atraso>5 and (cpag.id_status_conta=0 or cpag.id_status_conta = 1) )   THEN '98'
            ELSE trim(coalesce (to_char(cpag.id_status_conta  ,'9'),''))                                            
            end                                                                                                     ||'#'||
-	       CASE WHEN (cpag.qtd_dias_atraso>5 and (cpag.id_status_conta=0 or cpag.id_status_conta = 1) )   THEN 'atraso, antes de CRELIQ' --verificar com pedro se isso foi negociado
+	       CASE WHEN (cpag.qtd_dias_atraso>5 and (cpag.id_status_conta=0 or cpag.id_status_conta = 1) )   THEN 'atraso antes de CRELIQ' --verificar com pedro se isso foi negociado
            ELSE coalesce(tpst.desc_status,'')                                            
            end                                                                                                     ||'#'||
 	       coalesce (to_char   (cpag.dt_hr_status_conta  ,'DDMMYYYY')    , '')                                     ||'#'||
