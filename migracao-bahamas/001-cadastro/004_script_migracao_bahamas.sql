@@ -27,7 +27,7 @@ select
 	       coalesce  (ende.uf_r                  ,''        )                                                        ||'#'||                  
 	       coalesce  (ende.cep_r                 ,''        )                                                        ||'#'||                  
 	       CASE WHEN (cpag.qtd_dias_atraso>5 and (cpag.id_status_conta=0 or cpag.id_status_conta = 1) )   THEN '98'
-           ELSE trim(coalesce (to_char(cpag.id_status_conta  ,'9'),''))                                            
+           ELSE trim(coalesce (to_char(cpag.id_status_conta  ,'99'),''))                                            
            end                                                                                                     ||'#'||
 	       CASE WHEN (cpag.qtd_dias_atraso>5 and (cpag.id_status_conta=0 or cpag.id_status_conta = 1) )   THEN 'atraso antes de CRELIQ' --verificar com pedro se isso foi negociado
            ELSE coalesce(tpst.desc_status,'')                                            
@@ -55,7 +55,7 @@ select
 	       coalesce  (ende.uf_c                  ,''        )                                                        ||'#'||                  
 	       coalesce  (ende.cep_c                 ,''        )                                                        ||'#'||                  
 	       CASE cred.titularidade 
-	       WHEN 1 THEN  trim(coalesce (to_char(cpag.dia_vencimento   ,'9999'),''))                                                            
+	       WHEN 1 THEN  trim(coalesce (to_char(cpag.dia_vencimento   ,'99'),''))                                                            
 	       WHEN 0 THEN  ''                                  
            END                                                                                                     ||'#'||
            CASE cred.titularidade 
@@ -78,7 +78,7 @@ inner join suporte.tipo_status tpst on tpst.id_status = cpag.id_status_conta
 inner join cadastral.produto_instituicao prin on prin.id_prod_instituicao = cpag.id_prod_instituicao
 inner join transacional.saldo_conta_cred sacc on sacc.id_conta = cpag.id_conta 
 inner join transacional.temp_saldo_conta_cred sacc_temp on sacc_temp.id_conta = sacc.id_conta and sacc.ano_mes_fat=sacc_temp.ano_mes_fat
-inner join cadastral.conta_pessoa cpes on cpes.id_conta = cpag.id_conta 
+inner join cadastral.conta_pessoa cpes on cpes.id_conta = cpag.id_conta and cred.titularidade = cpes.id_titularidade
 inner join cadastral.pessoa pess on pess.id_pessoa = cpes.id_conta
 inner join cadastral.temp_end_bahamas ende on ende.id_pessoa = pess.id_pessoa
 left JOIN suporte.registro_arq_importacao_proposta_pf rapf ON rapf.documento = pess.documento

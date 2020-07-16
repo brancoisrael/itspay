@@ -12,5 +12,3 @@ CREATE INDEX idx_temp_saldo_conta_cred_id_conta
 ON transacional.temp_saldo_conta_cred(id_conta);
 
 
-
-

@@ -94,3 +94,21 @@ inner join  cadastral.credencial cred on cred.id_conta = cpag.id_conta
 where  cpag.id_instituicao = 1201 and  cpag.id_status_conta IN (68,70)
 and cred.titularidade = 1 
 -- FIM
+
+-- INICIO 74.104 
+select 
+count(*)
+from cadastral.conta_pagamento cpag
+inner join cadastral.temp_conta_pagamento_fat cpaf  on cpaf.id_conta = cpag.id_conta 
+inner join transacional.temp_liquidacao_saldo_conta_cred sacc on sacc.id_conta = cpag.id_conta
+left  join transacional.temp_liquidacao_transacao_apresentada tapr on tapr.id_conta = cpag.id_conta
+inner join cadastral.temp_produto_instituicao_config_credito picc on picc.id_conta = cpag.id_conta
+inner join cadastral.temp_2_escritorio_cobranca_conta escc on escc.id_conta = cpag.id_conta
+inner join cadastral.conta_pessoa cpes on cpes.id_conta = cpag.id_conta
+inner join cadastral.pessoa pess on cpes.id_pessoa = pess.id_pessoa
+where  cpag.id_instituicao = 1201 and  cpag.id_status_conta IN (68,70);
+-- FIM
+
+-- INICIO 74.056
+
+-- FIM

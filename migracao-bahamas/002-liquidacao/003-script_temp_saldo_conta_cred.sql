@@ -9,3 +9,14 @@ where  cpag.id_instituicao = 1201
 CREATE INDEX idx_transacao_apresentada_liquidacao_id_conta
 ON transacional.temp_liquidacao_transacao_apresentada(id_conta);
 
+/*
+
+create table cadastral.jcard_bahamas_liquidacao(
+id_conta text,
+saldo text;
+
+
+alter table cadastral.jcard_bahamas_liquidacao alter column id_conta TYPE numeric  USING (id_conta::numeric);
+
+select * from cadastral.jcard_bahamas_liquidacao where id_conta = 137523
+*/
