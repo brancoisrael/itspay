@@ -5,7 +5,9 @@ select
            coalesce  (prin.desc_prod_instituicao,''       )                                                        ||'#'||
            trim(coalesce (to_char(prin.id                  ,'99999999'),''))                                       ||'#'||
 	       coalesce  (pess.matricula           ,''        )                                                        ||'#'||
-	       coalesce  (pess.nome_completo       ,''        )                                                        ||'#'||
+	       CASE WHEN pess.nome_completo IS NULL THEN 	'SEM NOME'
+		   ELSE coalesce  (pess.nome_completo       ,''        )
+		   end												                                                        ||'#'||
 	       coalesce  (pess.nome_embossado      ,''        )                                                        ||'#'||
 	       coalesce  (pess.documento           ,''        )                                                        ||'#'||
 	       coalesce  (pess.rg                  ,''        )                                                        ||'#'||
@@ -32,7 +34,9 @@ select
 	       CASE WHEN (cpag.qtd_dias_atraso>5 and (cpag.id_status_conta=0 or cpag.id_status_conta = 1) )   THEN 'atraso antes de CRELIQ' --verificar com pedro se isso foi negociado
            ELSE coalesce(tpst.desc_status,'')                                            
            end                                                                                                     ||'#'||
-	       coalesce (to_char   (cpag.dt_hr_status_conta  ,'DDMMYYYY')    , '')                                     ||'#'||
+	       CASE WHEN cpag.dt_hr_status_conta IS NULL THEN     '01011900'                                
+		   ELSE coalesce (to_char   (cpag.dt_hr_status_conta  ,'DDMMYYYY')    , '')      
+		   end																		                               ||'#'||
 	       coalesce (to_char   (pess.dt_hr_inclusao      ,'DDMMYYYY')    , '')                                     ||'#'||
 	       trim(coalesce (to_char(pess.ddd_tel_residencial ,'99'),''))                                             ||'#'||
            trim(coalesce(to_char(pess.tel_residencial     ,'999999999'),''))                                       ||'#'||
@@ -63,7 +67,7 @@ select
 	       WHEN 0 THEN  ''                                
            END                                                                                                     ||'#'||
           CASE cred.titularidade 
-	       WHEN 1 THEN trim(coalesce (to_char(sacc.saldo_fatura_atual*100 ,'9999999999'),''))                                                                                    
+	       WHEN 1 THEN trim(coalesce (to_char(sacc_temp_saldo.saldo_fatura_atual*100 ,'9999999999'),''))                                                                                    
 	       WHEN 0 THEN  ''                                  
            END                                                                                                     ||'#'||
            trim(coalesce (to_char(tapr.parcela_futura ,'9999999999'),'')) 											   ||'#'||                  
@@ -77,6 +81,7 @@ inner join  cadastral.credencial cred on cred.id_conta = cpag.id_conta
 inner join suporte.tipo_status tpst on tpst.id_status = cpag.id_status_conta  
 inner join cadastral.produto_instituicao prin on prin.id_prod_instituicao = cpag.id_prod_instituicao
 inner join transacional.saldo_conta_cred sacc on sacc.id_conta = cpag.id_conta 
+left join transacional.temp_liquidacao_saldo_conta_cred sacc_temp_saldo on sacc_temp_saldo.id_conta = cpag.id_conta
 inner join transacional.temp_saldo_conta_cred sacc_temp on sacc_temp.id_conta = sacc.id_conta and sacc.ano_mes_fat=sacc_temp.ano_mes_fat
 inner join cadastral.conta_pessoa cpes on cpes.id_conta = cpag.id_conta and cred.titularidade = cpes.id_titularidade
 inner join cadastral.pessoa pess on pess.id_pessoa = cpes.id_conta
@@ -86,5 +91,4 @@ inner join transacional.temp_transacao_apresentada tapr on tapr.id_conta = cpag.
 inner join cadastral.conta_pagamento_fat cpaf on cpaf.id_conta = cpag.id_conta 
 where       cpag.id_instituicao = 1201
 and         cpag.id_status_conta not in (63, 64)
-and         cred.titularidade in (0, 1)                                                                                                         
-		
+and         cred.titularidade in (0, 1)
